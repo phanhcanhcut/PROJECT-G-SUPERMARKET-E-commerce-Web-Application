@@ -1,0 +1,37 @@
+- Luồng giao tiếp
+Customer Web / Admin Web → REST API → MySQL
+Payment Gateway → Webhook → REST API → MySQL
+====
+1.Auth Module
+- register/login/refresh/logout/me
+- hash password, JWT, refresh token
+- RBAC guard (ADMIN/STAFF/CUSTOMER)
+2.Catalog Module
+- categories, products, product images
+- search/filter/sort/paging
+- public endpoints cho customer
+- admin CRUD (đặt trong Admin module hoặc Catalog admin)
+3.Inventory Module
+- update tồn kho
+- query tồn kho theo product
+- logic lock tồn kho khi confirm/paid (ở Order/Payment)
+4.Cart Module
+- cart + cart_items
+- add/update/delete item
+- subtotal tính theo snapshot
+5.Order Module
+- tạo đơn từ cart
+- order detail/my orders/cancel
+- state machine order status
+- tạo order_items snapshot giá
+6.Payment Module
+- create payment session (payUrl)
+- webhook handler (verify signature + idempotency + transaction update)
+- provider abstraction (VNPay/MoMo/Stripe)
+7.Coupon Module
+- validate coupon, quản lý coupon admin
+- coupon usage policy
+8.Admin Module
+- dashboard, product CRUD, inventory update, order management, coupon management
+- reports revenue
+- audit logs
