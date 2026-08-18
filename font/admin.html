@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>G-SUPERMARKET • Quản trị</title>
+  <link rel="stylesheet" href="./assets/admin.css">
+  <style>
+    .content-section { display: none; }
+    .content-section.active { display: block; }
+    .menu-toggle { display: none; }
+  </style>
+</head>
+<body>
+<div class="admin-shell">
+  <main class="main-content main-content--tabs">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="btnMenuToggle" class="menu-toggle" type="button" aria-label="Mở menu" aria-expanded="false">☰</button>
+        <div>
+          <div class="eyebrow">G-SUPERMARKET ADMIN</div>
+          <h1 class="page-title">Quản trị hệ thống</h1>
+          <div class="page-subtitle">Quản lý đơn hàng, khách hàng, tồn kho, sản phẩm, mã giảm giá và báo cáo.</div>
+        </div>
+      </div>
+
+      <div class="topbar__right">
+        <div class="searchbar">
+          <span class="searchbar__icon">⌕</span>
+          <input id="topSearch" type="text" placeholder="Tìm mã đơn, SKU, email khách hàng...">
+        </div>
+
+        <div class="user-wrap">
+          <button class="admin-chip admin-chip--user" id="btnUserMenu" type="button">Người dùng</button>
+          <div class="user-menu" id="userMenu">
+            <div class="user-menu__title">Đăng nhập quản trị</div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" value="admin@gsuper.local">
+            </div>
+
+            <div class="field">
+              <label for="password">Mật khẩu</label>
+              <input id="password" value="Admin@123" type="password">
+            </div>
+
+            <button id="btnLogin" class="btn btn--primary btn--full" type="button">Đăng nhập</button>
+
+            <div class="user-menu__footer">
+              <span id="authPill" class="status-pill status-pill--danger"><span class="dot"></span> Chưa đăng nhập</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="admin-chip" id="btnLogout" type="button" style="display:none">Đăng xuất</button>
+      </div>
+    </header>
+
+    <nav class="tabs-bar" aria-label="Mục lục quản trị">
+      <button class="tab-btn active" type="button" data-section="orders">Đơn hàng</button>
+      <button class="tab-btn" type="button" data-section="customers">Người mua</button>
+      <button class="tab-btn" type="button" data-section="inventory">Tồn kho</button>
+      <button class="tab-btn" type="button" data-section="products">Sản phẩm</button>
+      <button class="tab-btn" type="button" data-section="coupons">Mã giảm giá</button>
+      <button class="tab-btn" type="button" data-section="reports">Báo cáo</button>
+    </nav>
+
+    <section class="stats-grid content-section active" id="auth" data-section="orders">
+      <article class="stat-card">
+        <div class="stat-card__label">Tất cả chờ duyệt</div>
+        <div id="pendingAllCount" class="stat-card__value">0</div>
+        <button class="btn btn--ghost" id="btnPendingAll">Xem ngay</button>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-card__label">ONLINE đã thanh toán</div>
+        <div id="pendingOnlinePaidCount" class="stat-card__value">0</div>
+        <button class="btn btn--ghost" id="btnPendingOnlinePaid">Xem ngay</button>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-card__label">COD chờ duyệt</div>
+        <div id="pendingCodCount" class="stat-card__value">0</div>
+        <button class="btn btn--ghost" id="btnPendingCOD">Xem ngay</button>
+      </article>
+
+      <article class="stat-card stat-card--accent">
+        <div class="stat-card__label">Trạng thái phiên</div>
+        <div class="stat-card__value stat-card__value--sm">ADMIN</div>
+        <div class="muted">Đăng nhập trong menu Người dùng ở góc phải.</div>
+      </article>
+    </section>
+
+    <section class="panel content-section active" id="orders" data-section="orders">
+      <div class="panel__head">
+        <div>
+          <h2>Đơn hàng</h2>
+          <p>Khu xử lý nhanh đơn hàng và bộ lọc danh sách.</p>
+        </div>
+        <div class="panel__meta">Phân quyền: ADMIN</div>
+      </div>
+
+      <div class="panel__body stack-lg">
+        <div class="filter-grid filter-grid--five">
+          <div class="field">
+            <label for="filterStatus">Trạng thái đơn</label>
+            <select id="filterStatus">
+              <option value="">Tất cả</option>
+              <option>NEW</option>
+              <option>CONFIRMED</option>
+              <option>PACKING</option>
+              <option>SHIPPING</option>
+              <option>DELIVERED</option>
+              <option>CANCELLED</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filterPayStatus">Trạng thái thanh toán</label>
+            <select id="filterPayStatus">
+              <option value="">Tất cả</option>
+              <option>PENDING_PAYMENT</option>
+              <option>PAID</option>
+              <option>PAYMENT_FAILED</option>
+              <option>REFUNDED</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filterPaymentMethod">Phương thức</label>
+            <select id="filterPaymentMethod">
+              <option value="">Tất cả</option>
+              <option>ONLINE</option>
+              <option>COD</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filterDateFrom">Từ ngày</label>
+            <input id="filterDateFrom" placeholder="YYYY-MM-DD 00:00:00" />
+          </div>
+
+          <div class="field">
+            <label for="filterDateTo">Đến ngày</label>
+            <input id="filterDateTo" placeholder="YYYY-MM-DD 23:59:59" />
+          </div>
+        </div>
+
+        <div class="filter-grid filter-grid--actions">
+          <div class="field field--wide">
+            <label for="orderCodeSearch">Tìm theo mã đơn</label>
+            <input id="orderCodeSearch" placeholder="VD: GS-2026..." />
+          </div>
+
+          <div class="field field--small">
+            <label for="ordersPageSize">Số dòng</label>
+            <select id="ordersPageSize">
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+
+          <div class="field field--button">
+            <label>&nbsp;</label>
+            <button class="btn btn--ghost" id="btnOrders">Tải lại</button>
+          </div>
+
+          <div class="field field--button">
+            <label>&nbsp;</label>
+            <button class="btn btn--ghost" id="btnExportOrders">Xuất CSV</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-card__toolbar">
+            <div class="table-card__title">Danh sách đơn hàng</div>
+            <div class="table-card__pager">
+              <button class="btn btn--ghost btn--sm" id="btnPrevOrdersA">◀ Trước</button>
+              <span id="ordersPageLabel" class="status-pill"><span class="dot"></span> Trang 1</span>
+              <button class="btn btn--ghost btn--sm" id="btnNextOrdersA">Sau ▶</button>
+            </div>
+          </div>
+          <div id="ordersBox" class="data-box"></div>
+        </div>
+
+        <div class="action-grid">
+          <div class="panel panel--subtle">
+            <div class="panel__head panel__head--sub">
+              <div>
+                <h3>Chi tiết & trạng thái</h3>
+                <p>Chọn đơn trong bảng để tự điền dữ liệu thao tác.</p>
+              </div>
+            </div>
+            <div class="panel__body stack-md">
+              <div class="filter-grid filter-grid--detail">
+                <div class="field">
+                  <label for="orderId">orderId</label>
+                  <input id="orderId" placeholder="Tự điền khi click vào đơn">
+                </div>
+
+                <div class="field field--button">
+                  <label>&nbsp;</label>
+                  <button class="btn" id="btnOrderDetail">Chi tiết</button>
+                </div>
+
+                <div class="field field--grow-2">
+                  <label for="nextStatus">Thao tác trạng thái</label>
+                  <select id="nextStatus">
+                    <option value="">Chọn một đơn để xem thao tác hợp lệ</option>
+                  </select>
+                </div>
+
+                <div class="field field--button">
+                  <label>&nbsp;</label>
+                  <button class="btn btn--success" id="btnUpdateStatus">Cập nhật</button>
+                </div>
+              </div>
+
+              <div class="filter-grid filter-grid--detail">
+                <div class="field">
+                  <label for="editOrderAddressId">addressId mới</label>
+                  <input id="editOrderAddressId" placeholder="VD: 3">
+                </div>
+
+                <div class="field">
+                  <label for="editOrderPaymentStatus">paymentStatus mới</label>
+                  <select id="editOrderPaymentStatus">
+                    <option value="">Không đổi</option>
+                    <option>PENDING_PAYMENT</option>
+                    <option>PAID</option>
+                    <option>PAYMENT_FAILED</option>
+                    <option>REFUNDED</option>
+                  </select>
+                </div>
+
+                <div class="field field--grow-2">
+                  <label for="editOrderNote">Ghi chú</label>
+                  <input id="editOrderNote" placeholder="Cập nhật ghi chú đơn hàng">
+                </div>
+
+                <div class="field field--button">
+                  <label>&nbsp;</label>
+                  <button class="btn" id="btnUpdateOrder">Lưu sửa đơn</button>
+                </div>
+              </div>
+
+              <div class="muted">Click một dòng trong bảng để tải chi tiết, điền orderId và đồng bộ form cập nhật.</div>
+              <div id="orderDetailBox" class="data-box data-box--soft"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-stack">
+      <section class="panel content-section" id="customers" data-section="customers">
+        <div class="panel__head">
+          <div>
+            <h2>Quản lý người mua</h2>
+            <p>Tìm kiếm, xem chi tiết và đổi trạng thái tài khoản khách hàng.</p>
+          </div>
+        </div>
+        <div class="panel__body stack-lg">
+          <div class="filter-grid filter-grid--customers">
+            <div class="field field--wide">
+              <label for="customerKeyword">Tìm kiếm</label>
+              <input id="customerKeyword" placeholder="Tên / email / phone">
+            </div>
+            <div class="field">
+              <label for="customerStatusFilter">Trạng thái</label>
+              <select id="customerStatusFilter">
+                <option value="">Tất cả</option>
+                <option>ACTIVE</option>
+                <option>BLOCKED</option>
+              </select>
+            </div>
+            <div class="field field--small">
+              <label for="customersPageSize">Số dòng</label>
+              <select id="customersPageSize">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--ghost" id="btnCustomers">Tải lại</button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-card__toolbar">
+              <div class="table-card__title">Danh sách người mua</div>
+              <div class="table-card__pager">
+                <button class="btn btn--ghost btn--sm" id="btnPrevCustomers">◀ Trước</button>
+                <span id="customersPageLabel" class="status-pill"><span class="dot"></span> Trang 1</span>
+                <button class="btn btn--ghost btn--sm" id="btnNextCustomers">Sau ▶</button>
+              </div>
+            </div>
+            <div id="customersBox" class="data-box"></div>
+          </div>
+
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="customerId">customerId</label>
+              <input id="customerId" placeholder="Tự điền khi click">
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnCustomerDetail">Chi tiết</button>
+            </div>
+            <div class="field">
+              <label for="customerNextStatus">Đổi trạng thái</label>
+              <select id="customerNextStatus">
+                <option value="">Chọn trạng thái</option>
+                <option>ACTIVE</option>
+                <option>BLOCKED</option>
+              </select>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--warning" id="btnCustomerStatus">Cập nhật</button>
+            </div>
+          </div>
+          <div id="customerDetailBox" class="data-box data-box--soft"></div>
+        </div>
+      </section>
+
+      <section class="panel content-section" id="inventory" data-section="inventory">
+        <div class="panel__head">
+          <div>
+            <h2>Quản lý tồn kho</h2>
+            <p>Tra cứu nhanh sản phẩm, cập nhật số lượng và điều chỉnh tồn kho.</p>
+          </div>
+        </div>
+        <div class="panel__body stack-lg">
+          <div class="filter-grid filter-grid--inventory">
+            <div class="field field--wide">
+              <label for="inventoryKeyword">Tìm kiếm</label>
+              <input id="inventoryKeyword" placeholder="Tên / SKU / brand">
+            </div>
+            <div class="field">
+              <label for="inventoryStatus">Trạng thái SP</label>
+              <select id="inventoryStatus">
+                <option value="">Tất cả</option>
+                <option>ACTIVE</option>
+                <option>INACTIVE</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="inventoryLowStock">Tồn thấp hơn hoặc bằng</label>
+              <input id="inventoryLowStock" placeholder="VD: 10">
+            </div>
+            <div class="field field--small">
+              <label for="inventoryPageSize">Số dòng</label>
+              <select id="inventoryPageSize">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--ghost" id="btnInventoryList">Tải lại</button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-card__toolbar">
+              <div class="table-card__title">Danh sách tồn kho</div>
+              <div class="table-card__pager">
+                <button class="btn btn--ghost btn--sm" id="btnPrevInventory">◀ Trước</button>
+                <span id="inventoryPageLabel" class="status-pill"><span class="dot"></span> Trang 1</span>
+                <button class="btn btn--ghost btn--sm" id="btnNextInventory">Sau ▶</button>
+              </div>
+            </div>
+            <div id="inventoryBox" class="data-box"></div>
+          </div>
+
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="invProductId">productId</label>
+              <input id="invProductId">
+            </div>
+            <div class="field">
+              <label for="invQty">Set số lượng</label>
+              <input id="invQty">
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--success" id="btnInv">Cập nhật</button>
+            </div>
+            <div class="field">
+              <label for="invDelta">Điều chỉnh (+/-)</label>
+              <input id="invDelta" placeholder="VD: -3 hoặc 5">
+            </div>
+            <div class="field field--grow-2">
+              <label for="invAdjustNote">Ghi chú</label>
+              <input id="invAdjustNote" placeholder="VD: Hàng hỏng / nhập thêm">
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnInvAdjust">Điều chỉnh</button>
+            </div>
+          </div>
+
+          <div id="invBox" class="inline-note">Sẵn sàng cập nhật tồn kho.</div>
+        </div>
+      </section>
+
+      <section class="panel content-section" id="products" data-section="products">
+        <div class="panel__head">
+          <div>
+            <h2>Sản phẩm</h2>
+            <p>Tạo mới sản phẩm, quản lý SKU, thương hiệu và tình trạng bán hàng.</p>
+          </div>
+        </div>
+        <div class="panel__body stack-lg">
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="pCategoryId">categoryId</label>
+              <input id="pCategoryId">
+            </div>
+            <div class="field field--grow-2">
+              <label for="pName">Tên</label>
+              <input id="pName">
+            </div>
+          </div>
+
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="pSku">SKU</label>
+              <input id="pSku">
+            </div>
+            <div class="field">
+              <label for="pBrand">Thương hiệu</label>
+              <input id="pBrand">
+            </div>
+            <div class="field">
+              <label for="pPrice">Giá</label>
+              <input id="pPrice">
+            </div>
+            <div class="field">
+              <label for="pDiscount">Giá giảm</label>
+              <input id="pDiscount">
+            </div>
+          </div>
+
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="pStock">Tồn kho ban đầu</label>
+              <input id="pStock">
+            </div>
+            <div class="field field--grow-2">
+              <label for="pImage1">Link ảnh</label>
+              <input id="pImage1">
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnCreateProduct">Tạo (Modal)</button>
+            </div>
+          </div>
+
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="pDeactivateId">productId</label>
+              <input id="pDeactivateId">
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--warning" id="btnDeactivateProduct">Ngừng bán</button>
+            </div>
+          </div>
+
+          <div id="prodBox" class="inline-note">Sẵn sàng tạo hoặc cập nhật sản phẩm.</div>
+        </div>
+      </section>
+
+      <section class="panel content-section" id="coupons" data-section="coupons">
+        <div class="panel__head">
+          <div>
+            <h2>Mã giảm giá</h2>
+            <p>Quản lý danh sách mã, bật/tắt và chỉnh sửa giá trị khuyến mãi.</p>
+          </div>
+        </div>
+        <div class="panel__body stack-lg">
+          <div class="filter-grid filter-grid--customers">
+            <div class="field">
+              <label for="couponActive">Trạng thái</label>
+              <select id="couponActive">
+                <option value="">Tất cả</option>
+                <option value="1">Đang bật</option>
+                <option value="0">Đã tắt</option>
+              </select>
+            </div>
+            <div class="field field--small">
+              <label for="couponsPageSize">Số dòng</label>
+              <select id="couponsPageSize">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--ghost" id="btnCoupons">Tải lại</button>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--ghost" id="btnExportCoupons">Xuất CSV</button>
+            </div>
+            <div class="field field--button field--push-right">
+              <label>&nbsp;</label>
+              <button class="btn btn--success" id="btnCreateCoupon">Tạo (Modal)</button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-card__toolbar">
+              <div class="table-card__title">Danh sách mã giảm giá</div>
+              <div class="table-card__pager">
+                <button class="btn btn--ghost btn--sm" id="btnPrevCoupons">◀ Trước</button>
+                <span id="couponsPageLabel" class="status-pill"><span class="dot"></span> Trang 1</span>
+                <button class="btn btn--ghost btn--sm" id="btnNextCoupons">Sau ▶</button>
+              </div>
+            </div>
+            <div id="couponsBox" class="data-box"></div>
+          </div>
+
+          <div class="filter-grid filter-grid--detail">
+            <div class="field">
+              <label for="cUpdId">couponId</label>
+              <input id="cUpdId">
+            </div>
+            <div class="field">
+              <label for="cUpdValue">Giá trị mới</label>
+              <input id="cUpdValue">
+            </div>
+            <div class="field">
+              <label for="cUpdActive">Bật/Tắt</label>
+              <select id="cUpdActive">
+                <option value="">Không đổi</option>
+                <option value="true">Bật</option>
+                <option value="false">Tắt</option>
+              </select>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnUpdateCoupon">Cập nhật</button>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--warning" id="btnDeactivateCoupon">Tắt mã</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel content-section" id="reports" data-section="reports">
+        <div class="panel__head">
+          <div>
+            <h2>Báo cáo doanh thu</h2>
+            <p>Xem nhanh doanh thu theo ngày hoặc tháng, hỗ trợ xuất CSV.</p>
+          </div>
+        </div>
+        <div class="panel__body stack-lg">
+          <div class="filter-grid filter-grid--reports">
+            <div class="field">
+              <label for="rFrom">Từ</label>
+              <input id="rFrom" placeholder="YYYY-MM-DD 00:00:00">
+            </div>
+            <div class="field">
+              <label for="rTo">Đến</label>
+              <input id="rTo" placeholder="YYYY-MM-DD 23:59:59">
+            </div>
+            <div class="field">
+              <label for="rGroup">Nhóm theo</label>
+              <select id="rGroup">
+                <option value="day">Ngày</option>
+                <option value="month">Tháng</option>
+              </select>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnReport">Xem</button>
+            </div>
+            <div class="field field--button">
+              <label>&nbsp;</label>
+              <button class="btn btn--ghost" id="btnExportReport">Xuất CSV</button>
+            </div>
+          </div>
+
+          <div id="reportBox" class="data-box"></div>
+        </div>
+      </section>
+    </section>
+
+    <script type="module" src="./js/admin.js"></script>
+  </main>
+</div>
+</body>
+</html>

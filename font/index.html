@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>G-SUPERMARKET • Siêu thị Online</title>
+  <!-- CSS đã tách ra file riêng -->
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+    <!-- =========================
+       HEADER / TOPBAR
+       Logo + tìm kiếm + auth + giỏ hàng
+       ========================= -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <div class="brand__logo">G</div>
+        <div class="brand__text">
+          <div class="brand__name">G-SUPERMARKET</div>
+          <div class="brand__sub">Tươi ngon mỗi ngày • Mua nhanh • Giao tiện</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="q" class="search__input" placeholder="Tìm sản phẩm, thương hiệu, SKU..." />
+        <button id="btnSearch" class="btn btn--primary">Tìm</button>
+      </div>
+
+      <div class="actions">
+        <button id="btnOrdersOpen" class="btn btn--ghost hidden">Theo dõi đơn</button>
+        <button id="btnAddrOpen" class="btn btn--ghost hidden">Địa chỉ</button>
+        <button id="btnLoginOpen" class="btn btn--ghost">Đăng nhập</button>
+        <button id="btnLogout" class="btn btn--ghost hidden">Đăng xuất</button>
+        <span id="rolePill" class="hidden"></span>
+        <button id="btnAdminOpen" class="btn btn--primary hidden">Quản trị hệ thống</button>
+
+        <button id="btnCartOpen" class="cartBtn">
+          <span class="cartBtn__icon">🛒</span>
+          <span class="cartBtn__text">Giỏ hàng</span>
+          <span id="cartBadge" class="cartBtn__badge hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+    <!-- =========================
+       HERO BANNER
+       Banner giới thiệu + CTA + gợi ý nhanh
+       ========================= -->
+  <section class="hero">
+    <div class="hero__banner">
+      <div class="hero__grid">
+        <div>
+          <div class="pill">🔥 Ưu đãi mỗi ngày • 🚚 Giao nhanh • 💳 VNPAY QR / COD</div>
+          <h1>Siêu thị online gọn, đẹp, nhanh và dễ dùng.</h1>
+          <p>
+            Tìm kiếm sản phẩm, thêm giỏ hàng, tạo đơn và thanh toán qua VNPAY QR hoặc COD
+            trong một giao diện sạch hơn và hiện đại hơn.
+          </p>
+
+          <div class="hero__cta">
+            <button id="btnBrowse" class="btn btn--primary">Xem sản phẩm</button>
+            <button id="btnDeals" class="btn btn--ghost">Gợi ý hôm nay</button>
+          </div>
+        </div>
+
+        <div class="heroPanel">
+          <div class="heroPanel__title">Khám phá nhanh</div>
+          <ol class="heroPanel__list">
+            <li>Tìm theo từ khóa hoặc SKU</li>
+            <li>Lọc theo thương hiệu, giá, danh mục</li>
+            <li>Xem nhanh sản phẩm và thêm vào giỏ</li>
+            <li>Đặt hàng và thanh toán qua VNPAY QR</li>
+          </ol>
+
+          <div class="heroPanel__chips">
+            <span class="promoChip promoLink" id="promoMilk">Gợi ý: sữa</span>
+            <span class="promoChip promoLink" id="promoSnack">Gợi ý: snack</span>
+            <span class="promoChip promoLink" id="promoRice">Gợi ý: gạo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- =========================
+       LAYOUT CHÍNH
+       Sidebar lọc + danh sách sản phẩm + recent + admin inline
+       ========================= -->
+  <main class="layout">
+        <!-- Sidebar trái: danh mục và bộ lọc -->
+    <aside class="sidebar">
+      <div class="sidebar__card">
+        <div class="sidebar__title">Danh mục</div>
+        <div id="catList" class="catList">
+          <div class="skeleton" style="height:14px;margin-top:10px"></div>
+          <div class="skeleton" style="height:14px;margin-top:10px"></div>
+          <div class="skeleton" style="height:14px;margin-top:10px"></div>
+        </div>
+      </div>
+
+      <div class="sidebar__card">
+        <div class="sidebar__title">Bộ lọc</div>
+
+        <label class="lbl">Thương hiệu</label>
+        <input id="brand" class="inp" placeholder="VD: Bless You" />
+
+        <div class="row2">
+          <div>
+            <label class="lbl">Giá từ</label>
+            <input id="minPrice" class="inp" placeholder="0" />
+          </div>
+          <div>
+            <label class="lbl">Giá đến</label>
+            <input id="maxPrice" class="inp" placeholder="200000" />
+          </div>
+        </div>
+
+        <label class="lbl">Sắp xếp</label>
+        <select id="sort" class="inp">
+          <option value="newest">Mới nhất</option>
+          <option value="price_asc">Giá tăng dần</option>
+          <option value="price_desc">Giá giảm dần</option>
+          <option value="name_asc">Tên A → Z</option>
+        </select>
+
+        <div class="row2">
+          <div>
+            <label class="lbl">Số lượng/trang</label>
+            <select id="pageSize" class="inp">
+              <option value="12">12</option>
+              <option value="24" selected>24</option>
+              <option value="48">48</option>
+            </select>
+          </div>
+          <div class="filterBtns">
+            <button id="btnApply" class="btn btn--primary btn--block">Áp dụng</button>
+            <button id="btnReset" class="btn btn--ghost btn--block">Đặt lại</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+        <!-- Khu nội dung chính: grid sản phẩm + phân trang -->
+    <section class="content">
+      <div class="content__top">
+        <div>
+          <div class="content__title">Sản phẩm</div>
+          <div id="resultMeta" class="content__meta">Đang tải…</div>
+        </div>
+
+        <div class="pager">
+          <button id="btnPrev" class="btn btn--ghost">◀ Trước</button>
+          <div id="pageLabel" class="pager__label">Trang 1</div>
+          <button id="btnNext" class="btn btn--ghost">Sau ▶</button>
+        </div>
+      </div>
+
+      <div id="grid" class="grid"></div>
+
+      <div class="content__bottom" style="margin-top:18px">
+        <button id="btnPrev2" class="btn btn--ghost">◀ Trước</button>
+        <div id="pageLabel2" class="pager__label">Trang 1</div>
+        <button id="btnNext2" class="btn btn--ghost">Sau ▶</button>
+      </div>
+    </section>
+
+        <!-- Khu sản phẩm vừa xem -->
+    <section class="recent" id="recentSection">
+      <div class="recent__head">
+        <div>
+          <div class="recent__title">Sản phẩm vừa xem</div>
+          <div class="recent__sub">Lưu lại những món bạn đã mở gần đây</div>
+        </div>
+        <button class="btn btn--ghost" id="btnClearRecent">Xóa lịch sử</button>
+      </div>
+      <div id="recentBox" class="recentGrid"></div>
+    </section>
+
+        <!-- Khu quản trị inline trong index
+         Mặc định bị ẩn, chỉ hiện theo role/admin flow -->
+    <section id="adminSection" class="adminSection hidden">
+  <div class="adminHero">
+    <div>
+      <div id="adminRolePill"></div>
+      <h2 class="adminTitle">Khu quản trị ngay trong index</h2>
+      <div id="adminWelcomeText" class="adminSub"></div>
+    </div>
+    <div class="adminStickyBar">
+      <button id="admBtnRefresh" class="btn btn--ghost">Tải lại dữ liệu</button>
+    </div>
+  </div>
+
+  <div class="adminGrid">
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Đơn hàng</h3>
+      <div class="adminCardSub">Xử lý nhanh đơn chờ duyệt, sửa thông tin đơn và cập nhật trạng thái.</div>
+      <div class="adminMetrics">
+        <div class="metricCard"><div class="metricCard__label">Tất cả chờ duyệt</div><div id="admPendingAllCount" class="metricCard__value">0</div><button id="admBtnPendingAll" class="btn btn--ghost btn--block">Xem ngay</button></div>
+        <div class="metricCard"><div class="metricCard__label">ONLINE đã thanh toán</div><div id="admPendingOnlinePaidCount" class="metricCard__value">0</div><button id="admBtnPendingOnlinePaid" class="btn btn--ghost btn--block">Xem ngay</button></div>
+        <div class="metricCard"><div class="metricCard__label">COD chờ duyệt</div><div id="admPendingCodCount" class="metricCard__value">0</div><button id="admBtnPendingCOD" class="btn btn--ghost btn--block">Xem ngay</button></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol3"><label>Trạng thái đơn</label><select id="admFilterStatus" class="inp"><option value="">Tất cả</option><option>NEW</option><option>CONFIRMED</option><option>PACKING</option><option>SHIPPING</option><option>DELIVERED</option><option>CANCELLED</option></select></div>
+        <div class="adminField adminCol3"><label>Trạng thái thanh toán</label><select id="admFilterPayStatus" class="inp"><option value="">Tất cả</option><option>PENDING_PAYMENT</option><option>PAID</option><option>PAYMENT_FAILED</option><option>REFUNDED</option></select></div>
+        <div class="adminField adminCol2"><label>Phương thức</label><select id="admFilterPaymentMethod" class="inp"><option value="">Tất cả</option><option>ONLINE</option><option>COD</option></select></div>
+        <div class="adminField adminCol2"><label>Từ ngày</label><input id="admFilterDateFrom" class="inp" placeholder="YYYY-MM-DD 00:00:00"></div>
+        <div class="adminField adminCol2"><label>Đến ngày</label><input id="admFilterDateTo" class="inp" placeholder="YYYY-MM-DD 23:59:59"></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol6"><label>Tìm theo mã đơn</label><input id="admOrderCodeSearch" class="inp" placeholder="VD: GS-2026..."></div>
+        <div class="adminField adminCol2"><label>Số dòng</label><select id="admOrdersPageSize" class="inp"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnOrders" class="btn btn--ghost btn--block">Tải lại</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnExportOrders" class="btn btn--ghost btn--block">Xuất CSV</button></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnPrevOrders" class="btn btn--ghost btn--block">◀ Trước</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnNextOrders" class="btn btn--ghost btn--block">Sau ▶</button></div>
+        <div class="adminField adminCol4"><label>Trang</label><div id="admOrdersPageLabel" class="adminHint">Trang 1</div></div>
+        <div class="adminField adminCol2"><label>orderId</label><input id="admOrderId" class="inp"></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnOrderDetail" class="btn btn--primary btn--block">Chi tiết</button></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol4"><label>Thao tác trạng thái</label><select id="admNextStatus" class="inp"><option value="">Chọn đơn để xem thao tác hợp lệ</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnUpdateStatus" class="btn btn--primary btn--block">Cập nhật</button></div>
+        <div class="adminField adminCol2"><label>addressId mới</label><input id="admEditOrderAddressId" class="inp" placeholder="VD: 3"></div>
+        <div class="adminField adminCol2"><label>paymentStatus</label><select id="admEditOrderPaymentStatus" class="inp"><option value="">Không đổi</option><option>PENDING_PAYMENT</option><option>PAID</option><option>PAYMENT_FAILED</option><option>REFUNDED</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnUpdateOrder" class="btn btn--ghost btn--block">Lưu sửa đơn</button></div>
+      </div>
+      <div class="adminRow"><div class="adminField adminCol12"><label>Ghi chú</label><input id="admEditOrderNote" class="inp" placeholder="Cập nhật ghi chú đơn hàng"></div></div>
+      <div id="admOrdersBox"></div>
+      <div id="admOrderDetailBox" style="margin-top:14px"></div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Người mua</h3>
+      <div class="adminRow">
+        <div class="adminField adminCol6"><label>Tìm kiếm</label><input id="admCustomerKeyword" class="inp" placeholder="Tên / email / phone"></div>
+        <div class="adminField adminCol2"><label>Trạng thái</label><select id="admCustomerStatusFilter" class="inp"><option value="">Tất cả</option><option>ACTIVE</option><option>BLOCKED</option></select></div>
+        <div class="adminField adminCol2"><label>Số dòng</label><select id="admCustomersPageSize" class="inp"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnCustomers" class="btn btn--ghost btn--block">Tải lại</button></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnPrevCustomers" class="btn btn--ghost btn--block">◀ Trước</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnNextCustomers" class="btn btn--ghost btn--block">Sau ▶</button></div>
+        <div class="adminField adminCol3"><label>Trang</label><div id="admCustomersPageLabel" class="adminHint">Trang 1</div></div>
+        <div class="adminField adminCol2"><label>customerId</label><input id="admCustomerId" class="inp"></div>
+        <div class="adminField adminCol1"><label>&nbsp;</label><button id="admBtnCustomerDetail" class="btn btn--primary btn--block">Chi tiết</button></div>
+        <div class="adminField adminCol1"><label>Đổi trạng thái</label><select id="admCustomerNextStatus" class="inp"><option value="">Chọn</option><option>ACTIVE</option><option>BLOCKED</option></select></div>
+        <div class="adminField adminCol1"><label>&nbsp;</label><button id="admBtnCustomerStatus" class="btn btn--ghost btn--block">Cập nhật</button></div>
+      </div>
+      <div id="admCustomersBox"></div>
+      <div id="admCustomerDetailBox" style="margin-top:14px"></div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Tồn kho</h3>
+      <div class="adminRow">
+        <div class="adminField adminCol4"><label>Tìm kiếm</label><input id="admInventoryKeyword" class="inp" placeholder="Tên / SKU / brand"></div>
+        <div class="adminField adminCol2"><label>Trạng thái SP</label><select id="admInventoryStatus" class="inp"><option value="">Tất cả</option><option>ACTIVE</option><option>INACTIVE</option></select></div>
+        <div class="adminField adminCol2"><label>Tồn <=</label><input id="admInventoryLowStock" class="inp" placeholder="VD: 10"></div>
+        <div class="adminField adminCol2"><label>Số dòng</label><select id="admInventoryPageSize" class="inp"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnInventoryList" class="btn btn--ghost btn--block">Tải lại</button></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnPrevInventory" class="btn btn--ghost btn--block">◀ Trước</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnNextInventory" class="btn btn--ghost btn--block">Sau ▶</button></div>
+        <div class="adminField adminCol4"><label>Trang</label><div id="admInventoryPageLabel" class="adminHint">Trang 1</div></div>
+        <div class="adminField adminCol2"><label>productId</label><input id="admInvProductId" class="inp"></div>
+        <div class="adminField adminCol2"><label>Set số lượng</label><input id="admInvQty" class="inp"></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnInv" class="btn btn--primary btn--block">Cập nhật</button></div>
+        <div class="adminField adminCol2"><label>Điều chỉnh (+/-)</label><input id="admInvDelta" class="inp" placeholder="VD: -3"></div>
+        <div class="adminField adminCol6"><label>Ghi chú</label><input id="admInvAdjustNote" class="inp" placeholder="Hàng hỏng / nhập thêm"></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnInvAdjust" class="btn btn--ghost btn--block">Điều chỉnh</button></div>
+      </div>
+      <div id="admInvBox" class="adminHint"></div>
+      <div id="admInventoryBox" style="margin-top:12px"></div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Sản phẩm</h3>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>categoryId</label><input id="admPCategoryId" class="inp"></div>
+        <div class="adminField adminCol4"><label>Tên</label><input id="admPName" class="inp"></div>
+        <div class="adminField adminCol2"><label>SKU</label><input id="admPSku" class="inp"></div>
+        <div class="adminField adminCol2"><label>Thương hiệu</label><input id="admPBrand" class="inp"></div>
+        <div class="adminField adminCol2"><label>Giá</label><input id="admPPrice" class="inp"></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>Giá giảm</label><input id="admPDiscount" class="inp"></div>
+        <div class="adminField adminCol2"><label>Tồn kho ban đầu</label><input id="admPStock" class="inp"></div>
+        <div class="adminField adminCol4"><label>Link ảnh</label><input id="admPImage1" class="inp"></div>
+        <div class="adminField adminCol4"><label>Mô tả</label><input id="admPDescription" class="inp"></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnCreateProduct" class="btn btn--primary btn--block">Tạo sản phẩm</button></div>
+        <div class="adminField adminCol2"><label>productId</label><input id="admPDeactivateId" class="inp"></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnDeactivateProduct" class="btn btn--ghost btn--block">Ngừng bán</button></div>
+        <div class="adminField adminCol6"><label>Trạng thái</label><div id="admProdBox" class="adminHint">Sẵn sàng.</div></div>
+      </div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Mã giảm giá</h3>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>Trạng thái</label><select id="admCouponActive" class="inp"><option value="">Tất cả</option><option value="1">Đang bật</option><option value="0">Đã tắt</option></select></div>
+        <div class="adminField adminCol2"><label>Số dòng</label><select id="admCouponsPageSize" class="inp"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnCoupons" class="btn btn--ghost btn--block">Tải lại</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnExportCoupons" class="btn btn--ghost btn--block">Xuất CSV</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnPrevCoupons" class="btn btn--ghost btn--block">◀ Trước</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnNextCoupons" class="btn btn--ghost btn--block">Sau ▶</button></div>
+      </div>
+      <div class="adminHint" id="admCouponsPageLabel">Trang 1</div>
+      <div id="admCouponsBox" style="margin-top:12px"></div>
+      <div class="adminSubTitle">Tạo coupon</div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>Code</label><input id="admCCode" class="inp"></div>
+        <div class="adminField adminCol2"><label>Type</label><select id="admCType" class="inp"><option>PERCENT</option><option>FIXED</option></select></div>
+        <div class="adminField adminCol2"><label>Value</label><input id="admCValue" class="inp"></div>
+        <div class="adminField adminCol2"><label>Min order</label><input id="admCMinOrder" class="inp"></div>
+        <div class="adminField adminCol2"><label>Max discount</label><input id="admCMaxDiscount" class="inp"></div>
+        <div class="adminField adminCol2"><label>Usage limit</label><input id="admCUsageLimit" class="inp"></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol3"><label>StartAt</label><input id="admCStartAt" class="inp" placeholder="YYYY-MM-DD HH:mm:ss"></div>
+        <div class="adminField adminCol3"><label>EndAt</label><input id="admCEndAt" class="inp" placeholder="YYYY-MM-DD HH:mm:ss"></div>
+        <div class="adminField adminCol2"><label>Active</label><select id="admCIsActive" class="inp"><option value="1">Bật</option><option value="0">Tắt</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnCreateCoupon" class="btn btn--primary btn--block">Tạo coupon</button></div>
+      </div>
+      <div class="adminSubTitle">Sửa / Tắt coupon</div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>couponId</label><input id="admCUpdId" class="inp"></div>
+        <div class="adminField adminCol2"><label>Giá trị mới</label><input id="admCUpdValue" class="inp"></div>
+        <div class="adminField adminCol2"><label>Bật/Tắt</label><select id="admCUpdActive" class="inp"><option value="">Không đổi</option><option value="true">Bật</option><option value="false">Tắt</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnUpdateCoupon" class="btn btn--ghost btn--block">Cập nhật</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnDeactivateCoupon" class="btn btn--ghost btn--block">Tắt mã</button></div>
+      </div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Báo cáo doanh thu</h3>
+      <div class="adminRow">
+        <div class="adminField adminCol3"><label>Từ</label><input id="admRFrom" class="inp" placeholder="YYYY-MM-DD 00:00:00"></div>
+        <div class="adminField adminCol3"><label>Đến</label><input id="admRTo" class="inp" placeholder="YYYY-MM-DD 23:59:59"></div>
+        <div class="adminField adminCol2"><label>Nhóm theo</label><select id="admRGroup" class="inp"><option value="day">Ngày</option><option value="month">Tháng</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnReport" class="btn btn--primary btn--block">Xem</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnExportReport" class="btn btn--ghost btn--block">Xuất CSV</button></div>
+      </div>
+      <div id="admReportBox"></div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Nhật ký thao tác</h3>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>actorId</label><input id="admAActor" class="inp"></div>
+        <div class="adminField adminCol3"><label>action</label><input id="admAAction" class="inp"></div>
+        <div class="adminField adminCol2"><label>Từ</label><input id="admAFrom" class="inp" placeholder="YYYY-MM-DD 00:00:00"></div>
+        <div class="adminField adminCol2"><label>Đến</label><input id="admATo" class="inp" placeholder="YYYY-MM-DD 23:59:59"></div>
+        <div class="adminField adminCol1"><label>Số dòng</label><select id="admAuditPageSize" class="inp"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnAudit" class="btn btn--ghost btn--block">Tải lại</button></div>
+      </div>
+      <div class="adminRow">
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnPrevAudit" class="btn btn--ghost btn--block">◀ Trước</button></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnNextAudit" class="btn btn--ghost btn--block">Sau ▶</button></div>
+        <div class="adminField adminCol3"><label>Trang</label><div id="admAuditPageLabel" class="adminHint">Trang 1</div></div>
+        <div class="adminField adminCol2"><label>&nbsp;</label><button id="admBtnExportAudit" class="btn btn--ghost btn--block">Xuất CSV</button></div>
+      </div>
+      <div id="admAuditBox"></div>
+    </section>
+
+    <section class="adminCard" data-role-scope="ADMIN">
+      <h3 class="adminCardTitle">Console</h3>
+      <div id="admLog" class="consoleLog">Sẵn sàng.</div>
+    </section>
+  </div>
+</section>
+  </main>
+
+    <!-- =========================
+       FOOTER
+       Thông tin hỗ trợ + chính sách + trust badges
+       ========================= -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__top">
+        <div class="footerBrand">
+          <div class="footerBrand__logo">G</div>
+          <div class="footerBrand__content">
+            <div class="footerBrand__name">G-SUPERMARKET</div>
+            <div class="footerBrand__desc">
+              Siêu thị online. Duyệt sản phẩm, thêm giỏ, đặt hàng và thanh toán qua VNPAY QR hoặc COD.
+            </div>
+          </div>
+        </div>
+
+        <div class="footerCols">
+          <div class="footerCol">
+            <div class="footerCol__title">Hỗ trợ khách hàng</div>
+            <a class="footerLink" href="#">Trung tâm trợ giúp</a>
+            <a class="footerLink" href="#">Hướng dẫn đặt hàng</a>
+            <a class="footerLink" href="#">Theo dõi đơn hàng</a>
+            <a class="footerLink" href="#">Liên hệ</a>
+          </div>
+
+          <div class="footerCol">
+            <div class="footerCol__title">Chính sách</div>
+            <a class="footerLink" href="#">Chính sách đổi trả</a>
+            <a class="footerLink" href="#">Chính sách giao hàng</a>
+            <a class="footerLink" href="#">Chính sách thanh toán</a>
+            <a class="footerLink" href="#">Bảo mật thông tin</a>
+          </div>
+
+          <div class="footerCol">
+            <div class="footerCol__title">Thông tin cửa hàng</div>
+            <div class="footerText">Giờ hoạt động: 7:00–22:00</div>
+            <div class="footerText">Hotline: 1900 0000</div>
+            <div class="footerText">Email: support@gsuper.local</div>
+            <div class="footerText">Địa chỉ: 123 Đường Demo, TP. Hồ Chí Minh</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__badges">
+        <div class="trust"><span class="trust__icon">🚚</span><div><div class="trust__title">Giao nhanh trong ngày</div><div class="trust__desc">Theo dõi tiến trình đơn hàng rõ ràng</div></div></div>
+        <div class="trust"><span class="trust__icon">💳</span><div><div class="trust__title">Thanh toán linh hoạt</div><div class="trust__desc">VNPAY QR hoặc COD</div></div></div>
+        <div class="trust"><span class="trust__icon">🔒</span><div><div class="trust__title">Bảo mật</div><div class="trust__desc">JWT + phân quyền Admin/Staff</div></div></div>
+      </div>
+
+      <div class="footer__bottom">
+        <div class="footerCopy">© <span id="year"></span> G-SUPERMARKET. All rights reserved.</div>
+        <div class="footerSocial">
+          <a class="socialBtn" href="#" aria-label="Facebook">f</a>
+          <a class="socialBtn" href="#" aria-label="Zalo">Z</a>
+          <a class="socialBtn" href="#" aria-label="TikTok">T</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+    <!-- Modal đăng nhập -->
+  <div id="loginModal" class="modal hidden"><div class="modal__panel"><div class="modal__head"><div><div class="modal__title">Đăng nhập</div><div class="modal__sub">Đăng nhập để lưu giỏ hàng, đặt đơn và xem lịch sử mua</div></div><button id="btnLoginClose" class="iconBtn">✕</button></div><div class="modal__body"><label class="lbl">Email</label><input id="email" class="inp" value="an@gmail.com" /><label class="lbl">Mật khẩu</label><input id="password" type="password" class="inp" value="StrongPass#1" /><button id="btnLogin" class="btn btn--primary btn--block" style="margin-top:16px">Đăng nhập</button><button id="btnOpenRegister" class="btn btn--ghost btn--block" style="margin-top:10px">Mở form đăng ký</button><div class="hint" style="margin-top:10px">Chưa có tài khoản? Bấm “Mở form đăng ký” để hiện form đăng ký USER.</div></div></div></div>
+
+    <!-- Modal đăng ký -->
+  <div id="registerModal" class="modal hidden"><div class="modal__panel"><div class="modal__head"><div><div class="modal__title">Đăng ký người dùng</div><div class="modal__sub">Tạo tài khoản USER để mua hàng và theo dõi đơn.</div></div><button id="btnRegisterClose" class="iconBtn">✕</button></div><div class="modal__body"><label class="lbl">Họ và tên</label><input id="regName" class="inp" placeholder="Nguyễn Văn A" /><label class="lbl">Email</label><input id="regEmail" class="inp" placeholder="ban@example.com" /><label class="lbl">Số điện thoại</label><input id="regPhone" class="inp" placeholder="09xxxxxxxx" /><label class="lbl">Mật khẩu</label><input id="regPassword" type="password" class="inp" placeholder="Tối thiểu 8 ký tự" /><label class="lbl">Nhập lại mật khẩu</label><input id="regPassword2" type="password" class="inp" placeholder="Nhập lại mật khẩu" /><button id="btnRegister" class="btn btn--primary btn--block" style="margin-top:16px">Đăng ký</button><div class="hint" style="margin-top:10px">Sau khi đăng ký thành công, bạn có thể đăng nhập ngay bằng vai trò USER.</div></div></div></div>
+    <!-- Modal xem nhanh chi tiết sản phẩm -->
+  <div id="pvModal" class="modal hidden"><div class="modal__panel modal__panel--wide"><div class="modal__head"><div><div id="pvTitle" class="modal__title">Sản phẩm</div><div id="pvSub" class="modal__sub">Chi tiết</div></div><button id="btnPvClose" class="iconBtn">✕</button></div><div class="modal__body"><div class="pv"><div class="pv__img" id="pvImg"></div><div class="pv__info"><div id="pvPrice" class="pv__price"></div><div id="pvStock" class="pv__stock"></div><div id="pvDesc" class="pv__desc"></div><div class="pv__actions"><input id="pvQty" class="inp" style="max-width:110px" type="number" min="1" value="1" /><button id="btnPvAdd" class="btn btn--primary">Thêm vào giỏ</button><button id="btnPvGoCart" class="btn btn--ghost">Mở giỏ hàng</button></div><div class="hint" style="margin-top:10px"></div></div></div></div></div></div>
+    <!-- Overlay cho drawer giỏ hàng -->
+  <div id="drawerMask" class="mask hidden"></div>
+    <!-- Drawer giỏ hàng bên phải -->
+  <aside id="drawer" class="drawer hidden"><div class="drawer__head"><div><div class="drawer__title">Giỏ hàng của bạn</div><div id="cartMeta" class="drawer__sub">—</div></div><button id="btnCartClose" class="iconBtn">✕</button></div><div id="cartItems" class="drawer__body"></div><div class="drawer__foot"><div class="sumRow"><div class="sumRow__label">Tạm tính</div><div id="cartSubtotal" class="sumRow__value">0</div></div><button id="btnCheckoutOpen" class="btn btn--primary btn--block">Đặt hàng</button><div class="hint" style="margin-top:10px">Mở form đặt hàng, điền thông tin người nhận rồi xác nhận đơn.</div></div></aside>
+    <!-- Modal sổ địa chỉ -->
+  <div id="addrModal" class="modal hidden"><div class="modal__panel modal__panel--wide"><div class="modal__head"><div><div class="modal__title">Sổ địa chỉ</div><div class="modal__sub">Quản lý địa chỉ giao hàng</div></div><button id="btnAddrClose" class="iconBtn">✕</button></div><div class="modal__body"><div class="row2"><div><div class="pill" style="color:#0f172a;background:#f8fafc;border-color:#e2e8f0;justify-content:space-between;width:100%"><span>Danh sách địa chỉ</span><button id="btnAddrRefresh" class="btn btn--ghost" style="height:38px">Tải lại</button></div><div id="addrList" style="margin-top:12px"></div></div><div><div class="pill" style="color:#0f172a;background:#f8fafc;border-color:#e2e8f0">Thêm / Sửa địa chỉ</div><label class="lbl">Số nhà, đường</label><input id="aDetail" class="inp" placeholder="VD: 12 Nguyễn Trãi" /><div class="row2"><div><label class="lbl">Phường / Xã</label><input id="aWard" class="inp" placeholder="VD: Phường 1" /></div><div><label class="lbl">Quận / Huyện</label><input id="aDistrict" class="inp" placeholder="VD: Quận 5" /></div></div><label class="lbl">Tỉnh / Thành phố</label><input id="aCity" class="inp" placeholder="VD: Hồ Chí Minh" /><div class="row2"><div><label class="lbl">ID khi sửa</label><input id="aId" class="inp" placeholder="Để trống nếu thêm mới" /></div><div style="display:flex;align-items:flex-end"><button id="btnAddrSave" class="btn btn--primary btn--block">Lưu</button></div></div><div class="hint" style="margin-top:10px">Bấm “Sửa” từ danh sách để tự đổ dữ liệu vào form.</div></div></div></div></div>
+    <!-- Modal đơn hàng của tôi -->
+  <div id="myOrdersModal" class="modal hidden"><div class="modal__panel modal__panel--wide"><div class="modal__head"><div><div class="modal__title">Đơn hàng của tôi</div><div class="modal__sub">Theo dõi và xem chi tiết các đơn đã tạo</div></div><button id="btnMyOrdersClose" class="iconBtn">✕</button></div><div class="modal__body"><div class="row2"><div><div class="pill" style="color:#0f172a;background:#f8fafc;border-color:#e2e8f0;justify-content:space-between;width:100%"><span>Danh sách đơn</span><button id="btnMyOrdersRefresh" class="btn btn--ghost" style="height:38px">Tải lại</button></div><div id="myOrdersList" style="margin-top:12px"></div></div><div><div class="pill" style="color:#0f172a;background:#f8fafc;border-color:#e2e8f0">Chi tiết đơn</div><div id="myOrderDetail" style="margin-top:12px;color:var(--muted)">Chọn một đơn để xem chi tiết.</div></div></div></div></div></div>
+    <!-- Modal checkout / tạo đơn / thanh toán -->
+  <div id="checkoutModal" class="modal hidden"><div class="modal__panel"><div class="modal__head"><div><div class="modal__title">Đặt hàng</div><div class="modal__sub">Điền thông tin người nhận, địa chỉ giao hàng rồi xác nhận đơn</div></div><button id="btnCheckoutClose" class="iconBtn">✕</button></div><div class="modal__body"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"><span style="padding:6px 10px;border-radius:999px;background:#eef2ff;border:1px solid #c7d2fe;font-size:12px;font-weight:800;color:#4338ca">Bước 1 • Điền thông tin đặt hàng</span><span id="step2Badge" style="padding:6px 10px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;font-weight:800;color:#64748b">Bước 2 • Thanh toán online</span></div><div style="padding:12px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc"><div style="font-weight:900;font-size:16px">Thông tin người nhận</div><div class="row2" style="margin-top:10px"><div><label class="lbl">Họ và tên</label><input id="orderFullName" class="inp" placeholder="Nguyễn Văn A" /></div><div><label class="lbl">Số điện thoại</label><input id="orderPhone" class="inp" placeholder="09xxxxxxxx" /></div></div><div class="row2"><div><label class="lbl">Email</label><input id="orderEmail" class="inp" placeholder="ban@example.com" /></div><div><label class="lbl">Địa chỉ đã lưu</label><select id="addressSelect" class="inp"></select></div></div><div class="hint">Bạn có thể chọn địa chỉ đã lưu hoặc nhập địa chỉ mới ngay bên dưới.</div><div class="row2"><div><label class="lbl">Số nhà, đường</label><input id="orderDetail" class="inp" placeholder="VD: 12 Nguyễn Trãi" /></div><div><label class="lbl">Phường / Xã</label><input id="orderWard" class="inp" placeholder="VD: Phường 1" /></div></div><div class="row2"><div><label class="lbl">Quận / Huyện</label><input id="orderDistrict" class="inp" placeholder="VD: Quận 5" /></div><div><label class="lbl">Tỉnh / Thành phố</label><input id="orderCity" class="inp" placeholder="VD: Hồ Chí Minh" /></div></div><label class="lbl">Ghi chú giao hàng</label><input id="orderNote" class="inp" placeholder="VD: Gọi trước khi giao" /><div class="row2"><div><label class="lbl">Phí ship</label><input id="shippingFee" class="inp" value="15000" /></div><div><label class="lbl">Mã giảm giá (không bắt buộc)</label><input id="couponCode" class="inp" value="TET2026" /></div></div><label class="lbl">Phương thức thanh toán</label><select id="paymentMethod" class="inp"><option value="ONLINE">ONLINE</option><option value="COD">COD</option></select><button id="btnCreateOrder" class="btn btn--primary btn--block" style="margin-top:10px">Xác nhận đặt hàng</button><div id="orderCreated" class="hint" style="margin-top:10px"></div></div><div id="paymentDemoBox" style="margin-top:14px;padding:12px;border:1px dashed #cbd5e1;border-radius:16px;background:#f8fafc"><div style="font-weight:900;font-size:16px">Bước 2 • Thanh toán VNPAY QR</div><div class="hint" style="margin-top:4px">Chỉ áp dụng cho đơn ONLINE. Sau khi thanh toán thành công, đơn vẫn chờ admin duyệt.</div><div class="row2" style="margin-top:10px"><div><label class="lbl">orderCode</label><input id="payOrderCode" class="inp" placeholder="GS-..." /></div><div><label class="lbl">Cổng</label><select id="provider" class="inp"><option value="vnpay">vnpay</option></select></div></div><div class="row2" style="margin-top:10px"><div><label class="lbl">Amount</label><input id="amount" class="inp" placeholder="Tổng thanh toán" /></div><div><label class="lbl">Mount</label><input id="mount" class="inp" placeholder="Input phụ để test nếu cần" /></div></div><div class="row2" style="margin-top:10px"><button id="btnCreatePayment" class="btn btn--primary btn--block">Thanh toán VNPAY QR</button><button id="btnPayStatus" class="btn btn--ghost btn--block">Kiểm tra trạng thái</button></div><div id="payInfo" class="hint" style="margin-top:10px"></div></div></div></div>
+    <!-- Nơi render toast thông báo -->
+  <div id="toastHost" class="toastHost"></div>
+    <!-- Loading overlay toàn trang -->
+  <div id="loading" class="loading hidden"><div class="loading__box"><div class="spinner"></div><div id="loadingText" class="loading__text">Đang tải…</div></div></div>
+    <!-- Script nhỏ: tự cập nhật năm ở footer -->
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+    <!-- =========================
+       SCRIPT MODULE CHÍNH
+       Auth + API + sản phẩm + giỏ hàng + checkout + admin inline
+       Bạn giữ nguyên toàn bộ phần JS gốc ở đây
+       ========================= -->
+  <script type="module" src="./js/index.js"></script>
+</body>
+</html>
